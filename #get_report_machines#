@@ -1,9 +1,0 @@
-from get_report_jobs import get_report_jobs
-
-
-def get_system_report():
-    machine_metrics = get_report_machines()
-        job_metrics = get_report_jobs()
-	    machine_metrics.update(job_metrics)
-	        return machine_metrics
-		1;95;0c
