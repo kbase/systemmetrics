@@ -1,5 +1,5 @@
-ErrorLogging:
-  image:
+SystemMetrics:
+  image: kbase/systemmetrics
   environment:
     USER_TOKEN: ${USER_TOKEN}
     SERVICE_WIZARD_URL: ${SERVICE_WIZARD_URL}
