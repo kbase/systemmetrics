@@ -7,7 +7,7 @@ def get_job_info(jobs):
     for job in jobs:
         job = job['classad']
         queue_requirement = job["requirements"].split("CLIENTGROUP")[1]
-        queue = queue_requirement.split("&&")[0].strip("[' ==)").strip('"')
+        queue = queue_requirement.split("&&")[0].strip("[' ==)/").strip('"')
         job_type = job["jobstatus"]
         if queue not in queue_dict.keys():
             queue_dict[queue] = {"queue_info": {'total_in_queue': 0, "average_q_time_hr": []},

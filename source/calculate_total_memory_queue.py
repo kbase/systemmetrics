@@ -1,5 +1,5 @@
 from calculate_memory_resources_queues import calculate_queues
-
+from math import floor 
 
 def calculate_queues_total(partionable_slots, queue_dict):
     queue_info = calculate_queues(partionable_slots, queue_dict)

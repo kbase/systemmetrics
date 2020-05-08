@@ -2,17 +2,17 @@ import requests
 import json
 import os
 from job_info import get_job_info
-
+auth_token = os.environ['USER_TOKEN']
+condor_job_url = os.environ['CONDOR_JOB_URL']
 
 def get_report_jobs():
     # Get jobs
-    job_url = "https://appdev.kbase.us/services/condor-rest-api/v1/jobs/kbase@proda-dock01?"
     running_jobs_constraint = "constraint=jobstatus==2"
     queued_jobs_constraint = "constraint=jobstatus==5"
-    response_running = requests.get(job_url + running_jobs_constraint,
-                                    headers={'Authorization': os.environ['KB_AUTH_TOKEN']})
-    response_queued = requests.get(job_url + queued_jobs_constraint,
-                                   headers={'Authorization': os.environ['KB_AUTH_TOKEN']})
+    response_running = requests.get(condor_job_url + running_jobs_constraint,
+                                    headers={'Authorization': auth_token})
+    response_queued = requests.get(condor_job_url + queued_jobs_constraint,
+                                   headers={'Authorization': auth_token})
     json_data_running = json.loads(response_running.text)
     json_data_queued = json.loads(response_queued.text)
     total_jobs = json_data_running + json_data_queued

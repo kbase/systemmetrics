@@ -7,13 +7,14 @@ from createslots import create_partionable_slots
 from generate_slot_report import generate_cg_report
 from calculate_total_memory_resources import calculate_total_cpus_memory_disk
 from calculate_total_memory_queue import calculate_queues_total
+auth_token = os.environ['USER_TOKEN']
+condor_machine_url = os.environ['CONDOR_MACHINE_URL']
 
 
 def get_report_machines():
     now = datetime.datetime.now().isoformat()
     # Get machines
-    url = "https://appdev.kbase.us/services/condor-rest-api/v1/grouped_status/state?query=startd"
-    response = requests.get(url, headers={'Authorization': os.environ['KB_AUTH_TOKEN']})
+    response = requests.get(condor_machine_url, headers={'Authorization': auth_token})
     json_data = json.loads(response.text)
     print("Repsonse status code is", response.status_code)
 
@@ -41,10 +42,10 @@ def get_report_machines():
     queue_info = {}
     queue_info = calculate_queues_total(partionable_slots, queue_info)
     memory_metrics_dict = {'timestamp': now,
-                           'environment': url,
+                           'environment': condor_machine_url,
                            'total_hosts': total_hosts,
                            'total_resources': total_resources,
-                           'queue_info': queue_info}
+                           'queue_memory_info': queue_info}
 
     return memory_metrics_dict
 
