@@ -45,7 +45,7 @@ def get_report_machines():
                            'environment': condor_machine_url,
                            'total_hosts': total_hosts,
                            'total_resources': total_resources,
-                           'queue_memory_info': queue_info}
+                           'queue_info': queue_info}
 
     return memory_metrics_dict
 
