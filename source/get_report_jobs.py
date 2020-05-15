@@ -8,7 +8,7 @@ condor_job_url = os.environ['CONDOR_JOB_URL']
 def get_report_jobs():
     # Get jobs
     running_jobs_constraint = "constraint=jobstatus==2"
-    queued_jobs_constraint = "constraint=jobstatus==5"
+    queued_jobs_constraint = "constraint=jobstatus==1"
     response_running = requests.get(condor_job_url + running_jobs_constraint,
                                     headers={'Authorization': auth_token})
     response_queued = requests.get(condor_job_url + queued_jobs_constraint,

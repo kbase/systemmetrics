@@ -25,7 +25,7 @@ def get_job_info(jobs):
             queue_array.append(queue_time)
             run_array.append(run_time)
             queue_dict[queue]['run_info']['total_running'] += 1
-        elif job_type == 5:
+        elif job_type == 1:
             q_date = job['qdate']
             queue_array = queue_dict[queue]['queue_info']["average_q_time_hr"]
             epoch_time_now = int(time.time())
