@@ -35,7 +35,7 @@ def get_report_machines():
     for slot in partionable_slots:
         partionable_slots[slot].calculate_actual_usage(input_dynamic_slots=dynamic_slots)
 
-    generate_cg_report(partionable_slots)
+    host_report = generate_cg_report(partionable_slots)
 
     total_hosts = len(partionable_slots)
     total_resources = calculate_total_cpus_memory_disk(partionable_slots)
@@ -46,7 +46,8 @@ def get_report_machines():
                            'total_hosts': total_hosts,
                            'total_resources': total_resources,
                            'queue_info': queue_info}
-
+    memory_metrics_dict.update(host_report)
+    
     return memory_metrics_dict
 
         
