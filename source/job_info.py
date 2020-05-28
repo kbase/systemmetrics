@@ -41,7 +41,6 @@ def get_job_info(jobs):
             epoch_time_now = int(time.time())
             queue_time = epoch_time_now - q_date
             queue_array.append(queue_time)
-            q_dates.append(q_date_iso)
             queue_dict[queue]['total_in_queue'] += 1
    
     formatted_dict = average_times(queue_dict)
