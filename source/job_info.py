@@ -37,7 +37,6 @@ def get_job_info(jobs):
             queue_dict[queue]['total_running'] += 1
         elif job_type == 1:
             q_date = job['qdate']
-            q_date_iso = datetime.datetime.utcfromtimestamp(q_date).isoformat()
             queue_array = queue_dict[queue]["average_q_time_hr"]
             epoch_time_now = int(time.time())
             queue_time = epoch_time_now - q_date
