@@ -1,5 +1,6 @@
 from get_report_machines import get_report_machines
 from get_report_jobs import get_report_jobs
+import numpy as np
 import client as c
 
 def get_system_report():
@@ -19,8 +20,10 @@ def get_system_report():
         queue_dict["environment"] = machine_metrics['environment']
         queue_dict["reserved"]['hosts'] = machine_metrics[queue]['claimed']
         queue_dict["available"]['hosts'] = machine_metrics[queue]['unclaimed']
-        if queue_dict['available']['hosts'] != 0:
-            queue_dict['utilization'] = queue_dict['reserved']['hosts']/queue_dict['available']['hosts']
+        queue_dict['utilization_hosts'] = np.float64(queue_dict['reserved']['hosts'])/queue_dict['available']['hosts']
+        queue_dict['utilization_cpus'] = np.float64(queue_dict['reserved']['cpus'])/queue_dict['available']['cpus']
+        queue_dict['utilization_disk'] = np.float64(queue_dict['reserved']['disk_gb'])/queue_dict['available']['disk_gb']
+        queue_dict['utilization_memory'] = np.float64(queue_dict['reserved']['memory_gb'])/queue_dict['available']['memory_gb']
         queue_dict["type"] = "schedulermetrics2"
         queue_info_array.append(queue_dict)
         c.to_logstashJson(queue_dict)
