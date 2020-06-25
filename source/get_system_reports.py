@@ -4,6 +4,7 @@ import json
 import requests
 import datetime
 import os
+import sys
 from createslots import create_dynamic_slots, create_partionable_slots
 from calculate_queue_resources import calculate_queues_total, get_job_info
 from generate_slot_report import generate_cg_report
@@ -16,6 +17,9 @@ condor_job_url = os.environ['CONDOR_JOB_URL']
 def get_system_report():
     machine_metrics = get_report_machines()
     job_metrics = get_report_jobs()
+    if len(job_metrics) <= 1:
+        print(job_metrics)
+        sys.exit("Error: queue information invalid to capture job metrics! Please check the formatting of the 'requirements' key for Condor jobs and make sure the parsing in 'get_jobs_info' is valid. ")
     queues = ['njs', 'bigmem', 'bigmemlong', 'concierge', 'kb_upload']
     queue_dictionary = {}
     queue_info_array = []

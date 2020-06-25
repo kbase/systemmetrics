@@ -38,10 +38,7 @@ def get_job_info(jobs):
     for job in jobs:
         job = job['classad']
         queue_requirement = job["requirements"]
-        if "concierge" in queue_requirement:
-            queue = queue_requirement.split(",")[0].split("(")[-1].strip('""')
-        else:
-            queue = queue_requirement.split("CLIENTGROUP")[1].split("&&")[0].strip("[' ==)/").strip('"')
+        queue = queue_requirement.split(",")[0].split("(")[-1].strip('""')
         job_type = job["jobstatus"]
         if queue not in queue_dict.keys():
             if job_type == 2 or job_type == 1:
