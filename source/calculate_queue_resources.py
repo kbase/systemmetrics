@@ -37,8 +37,7 @@ def get_job_info(jobs):
     run_times = []
     for job in jobs:
         job = job['classad']
-        queue_requirement = job["requirements"]
-        queue = queue_requirement.split(",")[0].split("(")[-1].strip('""')
+        queue = job["kb_clientgroup"]
         job_type = job["jobstatus"]
         if queue not in queue_dict.keys():
             if job_type == 2 or job_type == 1:
