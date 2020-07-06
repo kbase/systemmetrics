@@ -14,19 +14,12 @@ def average_times(queue_dict):
             queue_time_ave = mean(queue_time_array)
             run_time_ave = mean(run_time_array)
 
-        if queue == "kb_upload":
-            del queue_dict[queue]["average_q_time_hr"]
-            del queue_dict[queue]["average_run_time_hr"]
-            average_qtime_sec = floor(queue_time_ave)
-            average_runtime_sec = floor(run_time_ave)
-            queue_dict[queue]["average_q_time_sec"] = average_qtime_sec
-            queue_dict[queue]["average_run_time_sec"] = average_runtime_sec
-
-        else:
-            average_qtime_hours = floor(queue_time_ave / 3600)
-            average_runtime_hours = floor(run_time_ave / 3600)
-            queue_dict[queue]["average_q_time_hr"] = average_qtime_hours
-            queue_dict[queue]["average_run_time_hr"] = average_runtime_hours
+        average_qtime_hours = floor(queue_time_ave // 3600 )
+        average_runtime_hours = floor(run_time_ave // 3600 )
+        queue_dict[queue]["average_q_time_sec"] = floor(queue_time_ave)
+        queue_dict[queue]["average_run_time_sec"] = floor(run_time_ave)
+        queue_dict[queue]["average_run_time_hr"] = average_runtime_hours
+        queue_dict[queue]["average_q_time_hr"] = average_qtime_hours        
 
     return queue_dict
 
@@ -42,7 +35,8 @@ def get_job_info(jobs):
         if queue not in queue_dict.keys():
             if job_type == 2 or job_type == 1:
                 queue_dict[queue] = {'total_in_queue': 0, "average_q_time_hr": [],
-                                     'total_running': 0, "average_run_time_hr": []}
+                                     'total_running': 0, "average_run_time_hr": [],
+                                    "average_run_time_sec": None, "average_q_time_sec": None}
             else:
                 continue
 
