@@ -31,7 +31,7 @@ Or one can run the cron job by:
 $ docker-compose run --rm SystemMetrics ../bin/cron_shell.sh
 ```
 
-##Testing with Logstash
+## Testing with Logstash
 To test the output of the main script (get_system_reports) through Logstash, one must set up a 'Logstash Listener'.
 First pull the Logstash repo (https://github.com/kbase/logstash) into a separate directory and run:
 ```sh
@@ -49,7 +49,7 @@ Once the Logstash Listener/Debugger is up and running, you need to change the EL
 in your .env for your System Metrics environment. Now run the System Metrics cron job described above and view 
 its output in the Logstash Debugger. 
 
-##Tasting without Logstash
+## Tasting without Logstash
 To test any System Metrics code without sending logs to Logstash, please commit out the following line in 
 get_system_reports:
 ```sh
