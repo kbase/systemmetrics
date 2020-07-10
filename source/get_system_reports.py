@@ -15,20 +15,31 @@ condor_job_url = os.environ['CONDOR_JOB_URL']
 
 
 def get_system_report():
+    """
+    System Metrics is composed primarily of a Condor Scraper that scraps machine information and job information from
+    the Condor REST API.
+    This function merges the machine metrics dictionary with the job metrics dictionary by queue name.
+    Once all the information is consolidated new keys, such as utilization and the final 'type' key needed for Logstash
+    is added and the logs sent to Logstash.
+    """
     machine_metrics = get_report_machines()
     job_metrics = get_report_jobs()
+    # Job metrics coming from Condor should never be equal to 1 or 0
     if len(job_metrics) <= 1:
         print(job_metrics)
         sys.exit("Error: queue information invalid to capture job metrics! Please check the formatting of the 'requirements' key for Condor jobs and make sure the parsing in 'get_jobs_info' is valid. ")
+    # Loop through queues
     queues = ['njs', 'bigmem', 'bigmemlong', 'concierge', 'kb_upload']
-    queue_dictionary = {}
+    # The queue info array dict is here for debugging
     queue_info_array = []
     for queue in queues:
+        # If job information is available for a queue it means a job(s) is running or idle in that queue
         if queue in job_metrics.keys():
+            # Update machine metrics dictionary at queue with the job information fount
             machine_metrics[queue].update(job_metrics[queue])
-        queue_info = machine_metrics['queue_info']
+        queue_info_temp = machine_metrics['queue_info']
         queue_dict = machine_metrics[queue]
-        queue_dict.update(queue_info[queue])
+        queue_dict.update(queue_info_temp[queue])
         queue_dict["queue"] = queue
         queue_dict["timestamp"] = machine_metrics['timestamp']
         queue_dict["environment"] = machine_metrics['environment']
@@ -39,6 +50,7 @@ def get_system_report():
         queue_dict['utilization_disk'] = np.float64(queue_dict['reserved']['disk_gb'])/queue_dict['available']['disk_gb']
         queue_dict['utilization_memory'] = np.float64(queue_dict['reserved']['memory_gb'])/queue_dict['available']['memory_gb']
         queue_dict["type"] = "schedulermetrics2"
+        # the output of queue_info_array will be the same as the output sent to logstash
         queue_info_array.append(queue_dict)
         c.to_logstashJson(queue_dict)
         del machine_metrics['queue_info'][queue]
@@ -54,6 +66,10 @@ def get_system_report():
 
     
 def get_report_machines():
+    """
+    The dictionary returned by get_report_machines should be static and constant.
+    Each queue should always have basic memory/cpu/disk stats.
+    """
     now = datetime.datetime.now().isoformat()
     # Get machines
     response = requests.get(condor_machine_url, headers={'Authorization': auth_token})
@@ -70,19 +86,16 @@ def get_report_machines():
     dynamic_slots = create_dynamic_slots(claimed=claimed)
     print("Dynamic Slots:", len(dynamic_slots))
 
-    # queue = create_queue(njs)
-    # print("Number of jobs in NSJ: {}".format(len(dynamic_slots)))
-
     print("Creating actual memory/cpu/disk usages, rather than reserved")
     for slot in partionable_slots:
         partionable_slots[slot].calculate_actual_usage(input_dynamic_slots=dynamic_slots)
 
     host_report = generate_cg_report(partionable_slots)
-
+    # The initialization of machine dictionary and resources
     total_hosts = len(partionable_slots)
     total_resources = calculate_total_cpus_memory_disk(partionable_slots)
-    queue_info = {}
-    queue_info = calculate_queues_total(partionable_slots, queue_info)
+    queue_dict = {}
+    queue_info = calculate_queues_total(partionable_slots, queue_dict)
     memory_metrics_dict = {'timestamp': now,
                            'environment': condor_machine_url,
                            'total_hosts': total_hosts,
@@ -93,7 +106,8 @@ def get_report_machines():
     return memory_metrics_dict
 
 def get_report_jobs():
-    # Get jobs
+    """Gets all jobs running or idle in Condor and then separates by queue/kb_clientgroup."""
+    # Get running (2) and idle (1) jobs from Condor
     running_jobs_constraint = "constraint=jobstatus==2"
     queued_jobs_constraint = "constraint=jobstatus==1"
     response_running = requests.get(condor_job_url + running_jobs_constraint,
@@ -103,6 +117,7 @@ def get_report_jobs():
     json_data_running = json.loads(response_running.text)
     json_data_queued = json.loads(response_queued.text)
     total_jobs = json_data_running + json_data_queued
+    # Allocate total jobs to the get_job_info function for heavy data lifting
     job_info_by_queue = get_job_info(total_jobs)
     job_info_by_queue['total_queued'] = len(json_data_queued)
     job_info_by_queue['total_running'] = len(json_data_running)

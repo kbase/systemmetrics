@@ -26,18 +26,43 @@ Once it's built, one can run the source directory by the following command:
 $ docker-compose run --rm SystemMetrics
 ```
 
-Or one can run the error log cron job by:
+Or one can run the cron job by:
 ```sh
 $ docker-compose run --rm SystemMetrics ../bin/cron_shell.sh
 ```
 
 ## Testing
-To test the output of the main script (get_system_report) without uploading logs to
-logstash, one should comment out the following export statement:
+
+###Testing with Logstash
+To test the output of the main script (get_system_reports) through Logstash, one must set up a 'Logstash Listener'.
+First pull the Logstash repo (https://github.com/kbase/logstash) into a separate directory and run:
 ```sh
-c.to_logstashJson(machine_metrics)
+docker run --rm -it -e debug_output=True -p 9000:9000 -p 5044:5044 kbase/logstash
 ```
-and one should return "machine_metrics"
+If port 9000 is taken, run the following Docker commands to find the container name running on 9000:
+```sh
+docker ps | grep 9000
+```
+then 
+```sh
+docker kill CONATAINER_NAME
+```
+Once the Logstash Listener/Debugger is up and running, you need to change the ELASTICSEARCH_HOST url to 172.17.0.1 
+in your .env for your System Metrics environment. Now run the System Metrics cron job described above and view 
+its output in the Logstash Debugger. 
+
+###Tasting without Logstash
+To test any System Metrics code without sending logs to Logstash, please commit out the following line in 
+get_system_reports:
+```sh
+c.to_logstashJson(queue_dict)
+```
+Run the system metrics container and make sure the container as text editors such as nano or zile:
+```sh
+apt-get update
+apt-get install zile
+```
+Once you're debugging environment is setup in the Docker Container go ahead; edit, test and run in python. 
 
 
 # Guide to understanding job states
