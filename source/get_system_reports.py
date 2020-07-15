@@ -52,7 +52,7 @@ def get_system_report():
         queue_dict["type"] = "schedulermetrics2"
         # the output of queue_info_array will be the same as the output sent to logstash
         queue_info_array.append(queue_dict)
-        c.to_logstashJson(queue_dict)
+        c.to_logstashJson(json.dumps(queue_dict))
         del machine_metrics['queue_info'][queue]
         del machine_metrics[queue]
         
