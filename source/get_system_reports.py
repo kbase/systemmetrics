@@ -45,14 +45,27 @@ def get_system_report():
         queue_dict["environment"] = machine_metrics['environment']
         queue_dict["reserved"]['hosts'] = machine_metrics[queue]['claimed']
         queue_dict["available"]['hosts'] = machine_metrics[queue]['unclaimed']
-        queue_dict['utilization_hosts'] = np.float64(queue_dict['reserved']['hosts'])/queue_dict['available']['hosts']
-        queue_dict['utilization_cpus'] = np.float64(queue_dict['reserved']['cpus'])/queue_dict['available']['cpus']
-        queue_dict['utilization_disk'] = np.float64(queue_dict['reserved']['disk_gb'])/queue_dict['available']['disk_gb']
-        queue_dict['utilization_memory'] = np.float64(queue_dict['reserved']['memory_gb'])/queue_dict['available']['memory_gb']
+        # Logstash does not except 'infinity' from np.float64, thus it's easier to ask for forgiveness than permission as Grace Hopper famously said  
+        try:
+            queue_dict['utilization_hosts'] = queue_dict['reserved']['hosts']/queue_dict['available']['hosts']
+        except ZeroDivisionError:
+            queue_dict['utilization_hosts'] = queue_dict['reserved']['hosts']
+        try:
+            queue_dict['utilization_cpus'] = queue_dict['reserved']['cpus']/queue_dict['available']['cpus']
+        except ZeroDivisionError:
+            queue_dict['utilization_cpus'] = queue_dict['reserved']['cpus']
+        try:
+            queue_dict['utilization_disk'] = queue_dict['reserved']['disk_gb']/queue_dict['available']['disk_gb']
+        except ZeroDivisionError:
+            queue_dict['utilization_disk'] = queue_dict['reserved']['disk_gb']
+        try:
+            queue_dict['utilization_memory'] = queue_dict['reserved']['memory_gb']/queue_dict['available']['memory_gb']
+        except ZeroDivisionError:
+            queue_dict['utilization_memory'] = queue_dict['reserved']['memory_gb']
         queue_dict["type"] = "schedulermetrics2"
         # the output of queue_info_array will be the same as the output sent to logstash
         queue_info_array.append(queue_dict)
-        c.to_logstashJson(json.dumps(queue_dict))
+        c.to_logstashJson(queue_dict)
         del machine_metrics['queue_info'][queue]
         del machine_metrics[queue]
         
