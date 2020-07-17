@@ -1,7 +1,10 @@
 # KBase System Metrics
 
-This repository contains code for gathering and uploading KBase system metrics from Condor API such as memory, disk and cpu usage, as well as job and queue information.
+This repository contains code for gathering and uploading KBase system metrics from Condor API such as memory, disk and cpu usage, as well as job and queue information. 
+This repository is run every hour through a cron job.
 
+The main function of the this repo is the 'get_system_report' function located in the 'get_system_reports' file. This function calls 'get_report machines' and 'get_report_jobs', because System Metrics is composed of information for Condor jobs - running and idle - and KBase machine information.
+The 'get_report_jobs' function calls a job function 'get_job_info' from the file 'calculate_queue_resources'. Within the queue resources file the 'get_job_info' function is main. 
 ## Getting Started
 Before being able to run this docker container a ".env" file needs to be made. 
 It should be called .env and should contain the following:
@@ -45,7 +48,7 @@ then
 ```sh
 docker kill CONATAINER_NAME
 ```
-Once the Logstash Listener/Debugger is up and running, you need to change the ELASTICSEARCH_HOST url to 172.17.0.1 
+Once the Logstash Listener/Debugger is up and running, you need to change the ELASTICSEARCH_HOST url to ***.**.*.* (ask Steve Chan for the logstash debugger url to use)
 in your .env for your System Metrics environment. Now run the System Metrics cron job described above and view 
 its output in the Logstash Debugger. 
 
