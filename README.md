@@ -34,9 +34,14 @@ Or one can run the cron job by:
 $ docker-compose run --rm SystemMetrics ../bin/cron_shell.sh
 ```
 
-## Testing with Logstash
-To test the output of the main script (get_system_reports) through Logstash, one must set up a 'Logstash Listener'.
-First pull the Logstash repo (https://github.com/kbase/logstash) into a separate directory and run:
+# Testing with Logstash
+To test the output of the cron job or main script (get_errored_apps_EE2) through Logstash, one must set up a 'Logstash Listener/Debugger'.
+First fork then pull the Logstash repo (https://github.com/kbase/logstash) into a separate directory on docker03, construct a docker-compose.yml and env file containing the following:
+```sh
+IMAGE_NAME=
+DOCKER_REPO=
+``` 
+then run:
 ```sh
 docker run --rm -it -e debug_output=True -p 9000:9000 -p 5044:5044 kbase/logstash
 ```
