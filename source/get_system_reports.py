@@ -29,7 +29,7 @@ def get_system_report():
         print(job_metrics)
         sys.exit("Error: queue information invalid to capture job metrics! Please check the formatting of the 'requirements' key for Condor jobs and make sure the parsing in 'get_jobs_info' is valid. ")
     # Loop through queues
-    queues = ['njs', 'bigmem', 'bigmemlong', 'concierge', 'kb_upload']
+    queues = ['njs', 'bigmem', 'bigmemlong', 'concierge', 'kb_upload', "extreme"]
     # The queue info array dict is here for debugging
     queue_info_array = []
     for queue in queues:
