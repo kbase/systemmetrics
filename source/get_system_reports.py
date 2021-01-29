@@ -1,4 +1,3 @@
-import numpy as np
 import client as c
 import json
 import requests
@@ -27,16 +26,17 @@ def get_system_report():
     # Job metrics coming from Condor should never be equal to 1 or 0
     if len(job_metrics) <= 1:
         print(job_metrics)
-        sys.exit("Error: queue information invalid to capture job metrics! Please check the formatting of the 'requirements' key for Condor jobs and make sure the parsing in 'get_jobs_info' is valid. ")
+        msg = ("Error: queue information invalid to capture job metrics! Please check the formatting of the 'requirements' " +
+               "key for Condor jobs and make sure the parsing in 'get_jobs_info' is valid. ")
+        sys.exit(msg)
     # Loop through queues
-    queues = ['njs', 'bigmem', 'bigmemlong', 'concierge', 'kb_upload', "extreme"]
+    # queues = ['njs', 'bigmem', 'bigmemlong', 'concierge', 'kb_upload', "extreme"]
     # The queue info array dict is here for debugging
     queue_info_array = []
-    for queue in queues:
+    for queue in job_metrics.keys():
         # If job information is available for a queue it means a job(s) is running or idle in that queue
-        if queue in job_metrics.keys():
-            # Update machine metrics dictionary at queue with the job information fount
-            machine_metrics[queue].update(job_metrics[queue])
+        # Update machine metrics dictionary at queue with the job information fount
+        machine_metrics[queue].update(job_metrics[queue])
         queue_info_temp = machine_metrics['queue_info']
         queue_dict = machine_metrics[queue]
         queue_dict.update(queue_info_temp[queue])
@@ -45,7 +45,7 @@ def get_system_report():
         queue_dict["environment"] = machine_metrics['environment']
         queue_dict["reserved"]['hosts'] = machine_metrics[queue]['claimed']
         queue_dict["available"]['hosts'] = machine_metrics[queue]['unclaimed']
-        # Logstash does not except 'infinity' from np.float64, thus it's easier to ask for forgiveness than permission as Grace Hopper famously said  
+        # Logstash does not except 'infinity' from np.float64, thus it's easier to ask for forgiveness than permission as Grace Hopper famously said
         try:
             queue_dict['utilization_hosts'] = queue_dict['reserved']['hosts']/queue_dict['available']['hosts']
         except ZeroDivisionError:
@@ -68,7 +68,7 @@ def get_system_report():
         c.to_logstashJson(queue_dict)
         del machine_metrics['queue_info'][queue]
         del machine_metrics[queue]
-        
+
     print("Total Machine Information")
     del machine_metrics['queue_info']
     print("Total claimed hosts", machine_metrics['claimed'])
@@ -77,7 +77,7 @@ def get_system_report():
     print("Total resources", machine_metrics['total_resources'])
     print("{} queue records have been added to Logstash".format(len(queue_info_array)))
 
-    
+
 def get_report_machines():
     """
     The dictionary returned by get_report_machines should be static and constant.
@@ -115,8 +115,8 @@ def get_report_machines():
                            'total_resources': total_resources,
                            'queue_info': queue_info}
     memory_metrics_dict.update(host_report)
-    
     return memory_metrics_dict
+
 
 def get_report_jobs():
     """Gets all jobs running or idle in Condor and then separates by queue/kb_clientgroup."""

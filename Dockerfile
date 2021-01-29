@@ -38,7 +38,7 @@ ENV PYTHONPATH=/kb/runtime/lib/python3.6/site-packages/
 ENV PATH="/root/bin:/root/source:${PATH}"
 
 LABEL org.label-schema.build-date=$BUILD_DATE \
-      org.label-schema.vcs-url="https://github.com/CheyenneNS/SystemMetrics" \
+      org.label-schema.vcs-url="https://github.com/kbase/SystemMetrics" \
       org.label-schema.vcs-ref=$COMMIT \
       org.label-schema.schema-version="1.0.0-rc1" \
       us.kbase.vcs-branch=$BRANCH  \
