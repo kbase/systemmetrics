@@ -8,7 +8,7 @@ ARG COMMIT
 ARG BRANCH
 
 RUN apt-get update -y && \
-    apt-get install -y wget && \
+    apt-get install -y wget python-setuptools && \
     rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /kb/runtime
