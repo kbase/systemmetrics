@@ -2,7 +2,7 @@ from math import floor
 
 
 def calculate_total_cpus_memory_disk(partionable_slots):
-    """This function calculates the memory resources/allocated - available, reserved, actual - for a given machine. 
+    """This function calculates the memory resources/allocated - available, reserved, actual - for a given machine.
        The memory resources are formatted to a dictionary that is returned."""
 
     # Initiate memory variables
@@ -23,7 +23,7 @@ def calculate_total_cpus_memory_disk(partionable_slots):
         cpus += p_slot.totalslotcpus
         memory_mb += p_slot.totalmemory
         disk_kb += p_slot.totaldisk
-        # Reserved 
+        # Reserved
         cpus_reserved += p_slot.childcpus_reserved
         memory_mb_reserved += p_slot.childmemory_reserved
         disk_kb_reserved += p_slot.childdisk_reserved
@@ -48,7 +48,7 @@ def calculate_total_cpus_memory_disk(partionable_slots):
     available = {'disk_gb': disk_gb_available, 'memory_gb': memory_gb_available, 'cpus': cpus}
     reserved = {'disk_gb': disk_gb_reserved, 'memory_gb': memory_gb_reserved, 'cpus': cpus_reserved}
     actual = {'disk_gb': disk_gb_actual, 'memory_gb': memory_gb_actual}
-    # Dictionary of memory resources 
+    # Dictionary of memory resources
     resources = {'available': available,
                  'reserved': reserved,
                  'actual': actual}
