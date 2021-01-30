@@ -1,15 +1,16 @@
-from collections import defaultdict, Counter
+from collections import Counter
+
 
 def generate_cg_report(partionable_slots):
     print("Creating all machines report")
+
     report = {'claimed': 0, 'unclaimed': 0}
     cg_count = Counter()
-    queues = ["njs", "bigmemlong", "bigmem", "concierge", "kb_upload"]
-    
+
     for slot in partionable_slots:
         machine = partionable_slots[slot]
         queue = machine.clientgroup
-        cg_count[machine.clientgroup]+=1
+        cg_count[machine.clientgroup] += 1
         if queue not in report.keys():
             report[queue] = {'claimed': 0, 'unclaimed': 0}
         if(machine.claimed):
@@ -18,5 +19,5 @@ def generate_cg_report(partionable_slots):
         else:
             report['unclaimed'] += 1
             report[queue]["unclaimed"] += 1
-            
+
     return(report)

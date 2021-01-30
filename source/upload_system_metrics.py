@@ -1,5 +1,3 @@
-# UploadErrorLogs                                                                                                     
-#                                                                                                                     
 from get_system_reports import get_system_report
 import time
 import sys
