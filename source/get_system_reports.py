@@ -4,6 +4,7 @@ import requests
 import datetime
 import os
 import sys
+from pprint import pprint
 from createslots import create_dynamic_slots, create_partionable_slots
 from calculate_queue_resources import calculate_queues_total, get_job_info
 from generate_slot_report import generate_cg_report
@@ -11,6 +12,7 @@ from calculate_total_memory_resources import calculate_total_cpus_memory_disk
 auth_token = os.environ['USER_TOKEN']
 condor_machine_url = os.environ['CONDOR_MACHINE_URL']
 condor_job_url = os.environ['CONDOR_JOB_URL']
+DEBUG = os.environ.get("DEBUG", False)
 
 
 def get_system_report():
@@ -25,7 +27,7 @@ def get_system_report():
     job_metrics = get_report_jobs()
     # Job metrics coming from Condor should never be equal to 1 or 0
     if len(job_metrics) <= 1:
-        print(job_metrics)
+        pprint(job_metrics)
         msg = ("Error: queue information invalid to capture job metrics! Please check the formatting of the 'requirements' " +
                "key for Condor jobs and make sure the parsing in 'get_jobs_info' is valid. ")
         sys.exit(msg)
@@ -33,42 +35,49 @@ def get_system_report():
     # queues = ['njs', 'bigmem', 'bigmemlong', 'concierge', 'kb_upload', "extreme"]
     # The queue info array dict is here for debugging
     queue_info_array = []
+    print("Queues returned by EE2: ", ",".join(job_metrics.keys()))
+    if DEBUG:
+        pprint(job_metrics)
+
     for queue in job_metrics.keys():
         # If job information is available for a queue it means a job(s) is running or idle in that queue
         # Update machine metrics dictionary at queue with the job information fount
-        machine_metrics[queue].update(job_metrics[queue])
-        queue_info_temp = machine_metrics['queue_info']
-        queue_dict = machine_metrics[queue]
-        queue_dict.update(queue_info_temp[queue])
-        queue_dict["queue"] = queue
-        queue_dict["timestamp"] = machine_metrics['timestamp']
-        queue_dict["environment"] = machine_metrics['environment']
-        queue_dict["reserved"]['hosts'] = machine_metrics[queue]['claimed']
-        queue_dict["available"]['hosts'] = machine_metrics[queue]['unclaimed']
-        # Logstash does not except 'infinity' from np.float64, thus it's easier to ask for forgiveness than permission as Grace Hopper famously said
-        try:
-            queue_dict['utilization_hosts'] = queue_dict['reserved']['hosts']/queue_dict['available']['hosts']
-        except ZeroDivisionError:
-            queue_dict['utilization_hosts'] = queue_dict['reserved']['hosts']
-        try:
-            queue_dict['utilization_cpus'] = queue_dict['reserved']['cpus']/queue_dict['available']['cpus']
-        except ZeroDivisionError:
-            queue_dict['utilization_cpus'] = queue_dict['reserved']['cpus']
-        try:
-            queue_dict['utilization_disk'] = queue_dict['reserved']['disk_gb']/queue_dict['available']['disk_gb']
-        except ZeroDivisionError:
-            queue_dict['utilization_disk'] = queue_dict['reserved']['disk_gb']
-        try:
-            queue_dict['utilization_memory'] = queue_dict['reserved']['memory_gb']/queue_dict['available']['memory_gb']
-        except ZeroDivisionError:
-            queue_dict['utilization_memory'] = queue_dict['reserved']['memory_gb']
-        queue_dict["type"] = "schedulermetrics2"
-        # the output of queue_info_array will be the same as the output sent to logstash
-        queue_info_array.append(queue_dict)
-        c.to_logstashJson(queue_dict)
-        del machine_metrics['queue_info'][queue]
-        del machine_metrics[queue]
 
+        if queue in machine_metrics:
+            machine_metrics[queue].update(job_metrics[queue])
+            queue_info_temp = machine_metrics['queue_info']
+            queue_dict = machine_metrics[queue]
+            queue_dict.update(queue_info_temp[queue])
+            queue_dict["queue"] = queue
+            queue_dict["timestamp"] = machine_metrics['timestamp']
+            queue_dict["environment"] = machine_metrics['environment']
+            queue_dict["reserved"]['hosts'] = machine_metrics[queue]['claimed']
+            queue_dict["available"]['hosts'] = machine_metrics[queue]['unclaimed']
+            # Logstash does not except 'infinity' from np.float64, thus it's easier to ask for forgiveness than permission as Grace Hopper famously said
+            try:
+                queue_dict['utilization_hosts'] = queue_dict['reserved']['hosts']/queue_dict['available']['hosts']
+            except ZeroDivisionError:
+                queue_dict['utilization_hosts'] = queue_dict['reserved']['hosts']
+            try:
+                queue_dict['utilization_cpus'] = queue_dict['reserved']['cpus']/queue_dict['available']['cpus']
+            except ZeroDivisionError:
+                queue_dict['utilization_cpus'] = queue_dict['reserved']['cpus']
+            try:
+                queue_dict['utilization_disk'] = queue_dict['reserved']['disk_gb']/queue_dict['available']['disk_gb']
+            except ZeroDivisionError:
+                queue_dict['utilization_disk'] = queue_dict['reserved']['disk_gb']
+            try:
+                queue_dict['utilization_memory'] = queue_dict['reserved']['memory_gb']/queue_dict['available']['memory_gb']
+            except ZeroDivisionError:
+                queue_dict['utilization_memory'] = queue_dict['reserved']['memory_gb']
+            queue_dict["type"] = "schedulermetrics2"
+            # the output of queue_info_array will be the same as the output sent to logstash
+            queue_info_array.append(queue_dict)
+            c.to_logstashJson(queue_dict)
+            del machine_metrics['queue_info'][queue]
+            del machine_metrics[queue]
+        else:
+            print("Queue {} not among client groups reported, skipping".format(queue))
     print("Total Machine Information")
     del machine_metrics['queue_info']
     print("Total claimed hosts", machine_metrics['claimed'])
