@@ -6,7 +6,7 @@ class PartitionableSlot():
         self.machine_name = classad['machine']
         self.clientgroup = classad['clientgroup']
         self.totalslotcpus = classad['totalslotcpus']
-        self.totaldisk = classad['totaldisk']
+        self.totaldisk = max(1, classad['totaldisk'])
         self.detectedcpus = classad['detectedcpus']
         self.cpubusytime = classad['cpubusytime']
         self.totalmemory = classad['totalmemory']
