@@ -4,8 +4,10 @@ from statistics import mean
 
 
 def average_times(queue_dict):
-    """average_times is a helper function for get_job_info that takes an array of run times and queue times for each job run in a queue
-    and calculates the mean of the array. The function appends the mean as a value into the queue info dictionary in both it's original unit - seconds - and in hours. Returns the queue dictionaries with the appended mean"""
+    """average_times is a helper function for get_job_info that takes an array of run
+    times and queue times for each job run in a queue and calculates the mean of the array.
+    The function appends the mean as a value into the queue info dictionary in both it's
+    original unit - seconds - and in hours. Returns the queue dictionaries with the appended mean"""
     for queue in queue_dict.keys():
         # Collect run_time and q_time arrays
         queue_time_array = queue_dict[queue]["average_q_time_hr"]
@@ -31,7 +33,13 @@ def average_times(queue_dict):
 
 
 def get_job_info(jobs):
-    """get_jobs_info function is the main function to format the job portion of each queue dictionary for system metrics. It iterates through jobs in condor collects all the job information under the 'classad' key and checks which queue its looking at. For each queue it makes a queue_info dictionary that consists of the average run time and average q-time for jobs in the q (calculated by the helper function above) and counts how many jobs running jobs or queued jobs are currently in the queue. Returns a ultimate queue dictionary containing each queue seen as a queue to its sub job info dictionary."""
+    """get_jobs_info function is the main function to format the job portion of each queue
+    dictionary for system metrics. It iterates through jobs in condor collects all the job
+    information under the 'classad' key and checks which queue its looking at. For each queue
+    it makes a queue_info dictionary that consists of the average run time and average q-time
+    for jobs in the q (calculated by the helper function above) and counts how many jobs running
+    jobs or queued jobs are currently in the queue. Returns a ultimate queue dictionary containing
+    each queue seen as a queue to its sub job info dictionary."""
     queue_dict = {}
     # Interate through jobs
     for job in jobs:
@@ -80,7 +88,10 @@ def get_job_info(jobs):
 
 
 def calculate_queues(partionable_slots, queue_info):
-    """Calculate_queues is similar to get_job_info but in terms of memory/cpu/disk usage per queue not job stats. Only slots that are partionable can run jobs and thus have a kb_clientgroup/queue. This function iterates through partitionable slots and for each clientgroup/queue it sees it collection info on it's system usage."""
+    """Calculate_queues is similar to get_job_info but in terms of memory/cpu/disk
+    usage per queue not job stats. Only slots that are partionable can run jobs and
+    thus have a kb_clientgroup/queue. This function iterates through partitionable
+    slots and for each clientgroup/queue it sees it collection info on it's system usage."""
 
     data_storage_types = ['cpus', 'memory_mb', 'disk_kb',
                           'disk_kb_reserved', 'memory_mb_reserved', 'cpus_reserved',
@@ -126,7 +137,9 @@ def calculate_queues(partionable_slots, queue_info):
 
 
 def calculate_queues_total(partionable_slots, queue_dict):
-    """Calculate_queues_total primarily relies on a helper function 'calculate queues' to calculate the total usage (disk/cpu/memory) per queue. Once the total system usage has been calculated it converts the units from Kb to Gb"""
+    """Calculate_queues_total primarily relies on a helper function 'calculate queues'
+    to calculate the total usage (disk/cpu/memory) per queue. Once the total system
+    usage has been calculated it converts the units from Kb to Gb"""
     queue_info = calculate_queues(partionable_slots, queue_dict)
     for queue, memory_dict in queue_info.items():
         # Available Usage
