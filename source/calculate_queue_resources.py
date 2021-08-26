@@ -16,10 +16,14 @@ def average_times(queue_dict):
         if len(queue_time_array) == 1 and len(run_time_array) == 1:
             queue_time_ave = queue_time_array[0]
             run_time_ave = run_time_array[0]
-        # Else find the mean
-        else:
+        # Else check if more than 1 and return mean
+        elif len(queue_time_array) > 1 and len(run_time_array) > 1:
             queue_time_ave = mean(queue_time_array)
             run_time_ave = mean(run_time_array)
+        else:
+            queue_time_ave = 0
+            run_time_ave = 0
+
         # Convert mean to hours from seconds
         average_qtime_hours = floor(queue_time_ave // 3600)
         average_runtime_hours = floor(run_time_ave // 3600)
