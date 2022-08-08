@@ -1,4 +1,4 @@
-FROM python:3.6-slim
+FROM python:3.10.6-slim
 
 # Build arguments passed into the docker command for image metadata
 ARG BUILD_DATE
